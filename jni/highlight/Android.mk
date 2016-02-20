@@ -30,8 +30,7 @@ src/mbyte.c \
 com_jecelyin_highlight_Highlight.c
 
 
-LOCAL_LDLIBS += -llog
-LOCAL_CFLAGS += -O3 
+LOCAL_SHARED_LIBRARIES := liblog
 
 LOCAL_ARM_MODE := arm
 LOCAL_PRELINK_MODULE := false

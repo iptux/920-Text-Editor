@@ -24,8 +24,7 @@ LOCAL_SRC_FILES := com_jecelyin_editor_Grep.c  src/grep.c  src/wfopen.c  src/xre
   src/get_line_from_file.c  src/llist.c  src/wfopen_input.c  src/getopt32.c  src/recursive_action.c  \
   src/xfuncs_printf.c
 
-LOCAL_LDLIBS += -llog
-LOCAL_CFLAGS += -O3 
+LOCAL_SHARED_LIBRARIES := liblog
 
 LOCAL_ARM_MODE := arm
 LOCAL_PRELINK_MODULE := false

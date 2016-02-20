@@ -17,7 +17,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_SRC_FILES := $(call all-subdir-java-files)
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_PACKAGE_NAME := 920-Text-Editor
 
 LOCAL_JNI_SHARED_LIBRARIES := libgrep \
@@ -26,8 +26,4 @@ LOCAL_JNI_SHARED_LIBRARIES := libgrep \
 
 include $(BUILD_PACKAGE)
 
-include $(LOCAL_PATH)/jni/highlight/Android.mk \
-    $(LOCAL_PATH)/jni/charset-detector/Android.mk  \
-    $(LOCAL_PATH)/jni/grep/Android.mk
-#自动加载所有目录下的Android.mk
-#include $(call all-subdir-makefiles)
+include $(LOCAL_PATH)/jni/Android.mk
