@@ -32,6 +32,9 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 
 import com.android.internal.util.ArrayUtils;
+import com.android.internal.util.GrowingArrayUtils;
+
+import libcore.util.EmptyArray;
 
 /**
  * This is the class for text whose content and markup can both be changed.
@@ -62,19 +65,17 @@ implements CharSequence, GetChars, Spannable, Editable, Appendable,
     public SpannableStringBuilder(CharSequence text, int start, int end) {
         int srclen = end - start;
 
-        int len = ArrayUtils.idealCharArraySize(srclen + 1);
-        mText = new char[len];
+        mText = ArrayUtils.newUnpaddedCharArray(GrowingArrayUtils.growSize(srclen));
         mGapStart = srclen;
-        mGapLength = len - srclen;
+        mGapLength = mText.length - srclen;
 
         TextUtils.getChars(text, start, end, mText, 0);
 
         mSpanCount = 0;
-        int alloc = ArrayUtils.idealIntArraySize(0);
-        mSpans = new Object[alloc];
-        mSpanStarts = new int[alloc];
-        mSpanEnds = new int[alloc];
-        mSpanFlags = new int[alloc];
+        mSpans = EmptyArray.OBJECT;
+        mSpanStarts = EmptyArray.INT;
+        mSpanEnds = EmptyArray.INT;
+        mSpanFlags = EmptyArray.INT;
 
         if (text instanceof Spanned) {
             Spanned sp = (Spanned) text;
@@ -138,13 +139,14 @@ implements CharSequence, GetChars, Spannable, Editable, Appendable,
     }
 
     private void resizeFor(int size) {
-        int newlen = ArrayUtils.idealCharArraySize(size + 1);
+        final int oldLength = mText.length;
 //jec+
-        if ( size > 512*1024 ){
-            newlen = size + 128 * 1024;
+        if (size + 1 <= oldLength) {
+            return;
         }
 //end
-        char[] newtext = new char[newlen];
+        char[] newtext = ArrayUtils.newUnpaddedCharArray(GrowingArrayUtils.growSize(size));
+		final int newlen = newtext.length;
 
         int after = mText.length - (mGapStart + mGapLength);
 
@@ -599,28 +601,10 @@ implements CharSequence, GetChars, Spannable, Editable, Appendable,
             }
         }
 
-        if (mSpanCount + 1 >= mSpans.length) {
-            int newsize = ArrayUtils.idealIntArraySize(mSpanCount + 1);
-            Object[] newspans = new Object[newsize];
-            int[] newspanstarts = new int[newsize];
-            int[] newspanends = new int[newsize];
-            int[] newspanflags = new int[newsize];
-
-            System.arraycopy(mSpans, 0, newspans, 0, mSpanCount);
-            System.arraycopy(mSpanStarts, 0, newspanstarts, 0, mSpanCount);
-            System.arraycopy(mSpanEnds, 0, newspanends, 0, mSpanCount);
-            System.arraycopy(mSpanFlags, 0, newspanflags, 0, mSpanCount);
-
-            mSpans = newspans;
-            mSpanStarts = newspanstarts;
-            mSpanEnds = newspanends;
-            mSpanFlags = newspanflags;
-        }
-
-        mSpans[mSpanCount] = what;
-        mSpanStarts[mSpanCount] = start;
-        mSpanEnds[mSpanCount] = end;
-        mSpanFlags[mSpanCount] = flags;
+        mSpans = GrowingArrayUtils.append(mSpans, mSpanCount, what);
+        mSpanStarts = GrowingArrayUtils.append(mSpanStarts, mSpanCount, start);
+        mSpanEnds = GrowingArrayUtils.append(mSpanEnds, mSpanCount, end);
+        mSpanFlags = GrowingArrayUtils.append(mSpanFlags, mSpanCount, flags);
         mSpanCount++;
 
         if (send)
@@ -1136,19 +1120,12 @@ implements CharSequence, GetChars, Spannable, Editable, Appendable,
     
     public void drawTextRun(Canvas c, int start, int end,
             int contextStart, int contextEnd,
-            float x, float y, int flags, Paint p) {
+            float x, float y, boolean isRtl, Paint p) {
         checkRange("drawTextRun", start, end);
     }
     
-    public float getTextRunAdvances(int start, int end, int contextStart, int contextEnd, int flags,
+    public float getTextRunAdvances(int start, int end, int contextStart, int contextEnd, boolean isRtl,
             float[] advances, int advancesPos, Paint p) {
-
-        float ret=0;
-        return ret;
-    }
-
-    public float getTextRunAdvances(int start, int end, int contextStart, int contextEnd, int flags,
-            float[] advances, int advancesPos, Paint p, int reserved) {
 
         float ret=0;
         return ret;

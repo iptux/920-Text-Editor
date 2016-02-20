@@ -17,6 +17,9 @@
 package jecelyin.android.v2.text;
 
 import com.android.internal.util.ArrayUtils;
+import com.android.internal.util.GrowingArrayUtils;
+
+import libcore.util.EmptyArray;
 
 class PackedObjectVector<E>
 {
@@ -32,12 +35,12 @@ class PackedObjectVector<E>
     PackedObjectVector(int columns)
     {
         mColumns = columns;
-        mRows = ArrayUtils.idealIntArraySize(0) / mColumns;
+        mRows = 0;
 
         mRowGapStart = 0;
         mRowGapLength = mRows;
 
-        mValues = new Object[mRows * mColumns];
+        mValues = EmptyArray.OBJECT;
     }
 
     public E
@@ -109,9 +112,8 @@ class PackedObjectVector<E>
     private void
     growBuffer()
     {
-        int newsize = size() + 1;
-        newsize = ArrayUtils.idealIntArraySize(newsize * mColumns) / mColumns;
-        Object[] newvalues = new Object[newsize * mColumns];
+        Object[] newvalues = ArrayUtils.newUnpaddedObjectArray(GrowingArrayUtils.growSize(size()) * mColumns);
+		int newsize = newvalues.length / mColumns;
 
         int after = mRows - (mRowGapStart + mRowGapLength);
 

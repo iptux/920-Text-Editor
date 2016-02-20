@@ -2895,12 +2895,12 @@ public class TextView extends TextViewBase implements ViewTreeObserver.OnPreDraw
          * Just like {@link Canvas#drawTextRun}.
          */
         public void drawTextRun(Canvas c, int start, int end, int contextStart, int contextEnd,
-                float x, float y, int flags, Paint p){
+                float x, float y, boolean isRtl, Paint p){
             //jec+
             int count = end - start;
             int contextCount = contextEnd - contextStart;
             c.drawTextRun(mChars, start + mStart, count, contextStart + mStart,
-                    contextCount, x, y, flags, p);
+                    contextCount, x, y, isRtl, p);
             //end
         }
 
@@ -2909,29 +2909,14 @@ public class TextView extends TextViewBase implements ViewTreeObserver.OnPreDraw
          * Just like {@link Paint#getTextRunAdvances}.
          */
         public float getTextRunAdvances(int start, int end, int contextStart, int contextEnd,
-                int flags, float[] advances, int advancesIndex, Paint paint){
+                boolean isRtl, float[] advances, int advancesIndex, Paint paint){
 //            return 0; //jec-
 //jec+
             int count = end - start;
             int contextCount = contextEnd - contextStart;
             return paint.getTextRunAdvances(mChars, start + mStart, count,
-                    contextStart + mStart, contextCount, flags, advances,
+                    contextStart + mStart, contextCount, isRtl, advances,
                     advancesIndex);
-//end
-        }
-
-        /**
-         * Just like {@link Paint#getTextRunAdvances}.
-         */
-        public float getTextRunAdvances(int start, int end, int contextStart, int contextEnd,
-                int flags, float[] advances, int advancesIndex, Paint paint, int reserved){
-//            return 0; //jec-
-//jec+
-            int count = end - start;
-            int contextCount = contextEnd - contextStart;
-            return paint.getTextRunAdvances(mChars, start + mStart, count,
-                    contextStart + mStart, contextCount, flags, advances,
-                    advancesIndex, reserved);
 //end
         }
 

@@ -27,6 +27,7 @@ import android.text.style.MetricAffectingSpan;
 import android.text.style.ReplacementSpan;
 
 import com.android.internal.util.ArrayUtils;
+import com.android.internal.util.GrowingArrayUtils;
 import com.jecelyin.editor.EditorSettings;
 
 /**
@@ -94,9 +95,8 @@ extends Layout
             mEllipsizedWidth = outerwidth;
         }
 
-        mLines = new int[ArrayUtils.idealIntArraySize(2 * mColumns)];
-        mLineDirections = new Directions[
-                             ArrayUtils.idealIntArraySize(2 * mColumns)];
+        mLineDirections = ArrayUtils.newUnpaddedArray(Directions.class, 2 * mColumns);
+        mLines = new int[mLineDirections.length];
 
         generate(source, bufstart, bufend, paint, outerwidth, align,
                  spacingmult, spacingadd, includepad, includepad,
@@ -112,9 +112,8 @@ extends Layout
         super(null, null, 0, null, 0, 0);
 
         mColumns = COLUMNS_ELLIPSIZE;
-        mLines = new int[ArrayUtils.idealIntArraySize(2 * mColumns)];
-        mLineDirections = new Directions[
-                             ArrayUtils.idealIntArraySize(2 * mColumns)];
+        mLineDirections = mLineDirections = ArrayUtils.newUnpaddedArray(Directions.class, 2 * mColumns);
+        mLines = new int[mLineDirections.length];
     }
 
     /* package */ void generate(CharSequence source, int bufstart, int bufend,
@@ -137,9 +136,9 @@ extends Layout
         boolean first = true;
 
         if (mChdirs == null) {
-            mChdirs = new byte[ArrayUtils.idealByteArraySize(bufsiz + 1)];
-            mChs = new char[ArrayUtils.idealCharArraySize(bufsiz + 1)];
-            mWidths = new float[ArrayUtils.idealIntArraySize((bufsiz + 1) * 2)];
+            mChdirs = ArrayUtils.newUnpaddedByteArray(bufsiz + 1);
+            mChs = ArrayUtils.newUnpaddedCharArray(GrowingArrayUtils.growSize(bufsiz));
+            mWidths = ArrayUtils.newUnpaddedFloatArray(mChs.length * 2);
         }
 
         byte[] chdirs = mChdirs;
@@ -189,8 +188,7 @@ extends Layout
                 if (chooseht.length != 0) {
                     if (choosehtv == null ||
                         choosehtv.length < chooseht.length) {
-                        choosehtv = new int[ArrayUtils.idealIntArraySize(
-                                            chooseht.length)];
+                        choosehtv = ArrayUtils.newUnpaddedIntArray(chooseht.length);
                     }
 
                     for (int i = 0; i < chooseht.length; i++) {
@@ -211,15 +209,15 @@ extends Layout
             }
 
             if (end - start > chdirs.length) {
-                chdirs = new byte[ArrayUtils.idealByteArraySize(end - start)];
+                chdirs = ArrayUtils.newUnpaddedByteArray(end - start);
                 mChdirs = chdirs;
             }
             if (end - start > chs.length) {
-                chs = new char[ArrayUtils.idealCharArraySize(end - start)];
+                chs = ArrayUtils.newUnpaddedCharArray(end - start);
                 mChs = chs;
             }
             if ((end - start) * 2 > widths.length) {
-                widths = new float[ArrayUtils.idealIntArraySize((end - start) * 2)];
+                widths = ArrayUtils.newUnpaddedFloatArray((end - start) * 2);
                 mWidths = widths;
             }
 
@@ -987,16 +985,15 @@ extends Layout
         // Log.e("text", "line " + start + " to " + end + (last ? "===" : ""));
 
         if (want >= lines.length) {
-            int nlen = ArrayUtils.idealIntArraySize(want + 1);
-            int[] grow = new int[nlen];
-            System.arraycopy(lines, 0, grow, 0, lines.length);
-            mLines = grow;
-            lines = grow;
-
-            Directions[] grow2 = new Directions[nlen];
+            Directions[] grow2 = ArrayUtils.newUnpaddedArray(Directions.class, GrowingArrayUtils.growSize(want));
             System.arraycopy(mLineDirections, 0, grow2, 0,
                              mLineDirections.length);
             mLineDirections = grow2;
+
+            int[] grow = new int[grow2.length];
+            System.arraycopy(lines, 0, grow, 0, lines.length);
+            mLines = grow;
+            lines = grow;
         }
 
         if (chooseht != null) {
